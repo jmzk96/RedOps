@@ -1,0 +1,9 @@
+apiVersion: redis.jmzk96.com/v1alpha1
+kind: RedisCluster
+metadata:
+  labels:
+    app.kubernetes.io/name: init
+    app.kubernetes.io/managed-by: kustomize
+  name: rediscluster-sample
+spec:
+  # TODO(user): Add fields here
