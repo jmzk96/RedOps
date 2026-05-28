@@ -9,10 +9,10 @@ RUN echo "export OS=$(uname | awk '{print tolower($0)}')" >> ~/.bashrc
 RUN echo "export OPERATOR_SDK_DL_URL=https://github.com/operator-framework/operator-sdk/releases/download/v1.42.2" >> ~/.bashrc
 
 ## copying file because source command not working in Dockerfile
-COPY reload_env.sh reload_env.sh
-RUN cat /workspace/reload_env.sh
-RUN sudo chmod +x /workspace/reload_env.sh
-RUN /workspace/reload_env.sh
+COPY reload_and_download.sh reload_and_download.sh
+RUN cat /workspace/reload_and_download.sh
+RUN sudo chmod +x /workspace/reload_and_download.sh
+RUN /workspace/reload_and_download.sh
 
 # RUN gpg --keyserver keyserver.ubuntu.com --recv-keys 052996E2A20B5C7E
 # RUN curl -LO ${OPERATOR_SDK_DL_URL}/checksums.txt && curl -LO ${OPERATOR_SDK_DL_URL}/checksums.txt.asc

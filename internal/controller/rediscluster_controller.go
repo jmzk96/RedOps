@@ -19,18 +19,26 @@ package controller
 import (
 	"context"
 
+	"go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	logf "sigs.k8s.io/controller-runtime/pkg/log"
 
-	redisv1alpha1 "github.com/jmzk96/RedOps/api/v1alpha1"
+	redopsv1alpha1 "github.com/jmzk96/RedOps/api/v1alpha1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/client-go/tools/record"
 )
 
 // RedisClusterReconciler reconciles a RedisCluster object
 type RedisClusterReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	DirectClient     client.Reader
+	Log              zap.Logger
+	Scheme           *runtime.Scheme
+	Namespaces       []string
+	Recorder         record.EventRecorder
+	RequeueIntervals map[string]int
+	RequeueOffset    int
 }
 
 // +kubebuilder:rbac:groups=redis.jmzk96.com,resources=redisclusters,verbs=get;list;watch;create;update;patch;delete
@@ -47,17 +55,20 @@ type RedisClusterReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.21.0/pkg/reconcile
 func (r *RedisClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = logf.FromContext(ctx)
-
-	// TODO(user): your logic here
-
-	return ctrl.Result{}, nil
+	redisCluster := &redopsv1alpha1.RedisCluster{}
+	if err := r.Get(ctx, req.NamespacedName, redisCluster); err != nil {
+		if apierrors.IsNotFound(err) {
+			r.Log.Info("RedisCluster resource not found. Ignoring since object must be deleted.")
+			return ctrl.Result{}, nil
+		}
+		return ctrl.Result{}, err
+	}
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *RedisClusterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&redisv1alpha1.RedisCluster{}).
+		For(&redopsv1alpha1.RedisCluster{}).
 		Named("rediscluster").
 		Complete(r)
 }
