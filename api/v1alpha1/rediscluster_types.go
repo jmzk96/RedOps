@@ -68,6 +68,20 @@ type Service struct {
 	Enabled *bool `json:"enabled,omitempty"`
 }
 
+type RedisConfig struct {
+	MaxMemoryPercentOfLimit *int32   `json:"maxMemoryPercentOfLimit,omitempty"`
+	DynamicConfig           []string `json:"dynamicConfig,omitempty"`
+	AdditionalRedisConfig   *string  `json:"additionalRedisConfig,omitempty"`
+}
+
+type RedisLeader struct {
+	Replicas     *int32              `json:"replicas,omitempty"`
+	RedisConfig  *RedisConfig        `json:"redisConfig,omitempty"`
+	Affinity     *corev1.Affinity    `json:"affinity,omitempty"`
+	NodeSelector map[string]string   `json:"nodeSelector,omitempty"`
+	Tolerations  []corev1.Toleration `json:"tolerations,omitempty"`
+}
+
 // RedisClusterSpec defines the desired state of RedisCluster.
 type RedisClusterSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster

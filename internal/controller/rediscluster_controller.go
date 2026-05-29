@@ -27,6 +27,7 @@ import (
 	redopsv1alpha1 "github.com/jmzk96/RedOps/api/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/client-go/tools/record"
+	zax "github.com/yuseferi/zax/v2"
 )
 
 // RedisClusterReconciler reconciles a RedisCluster object
@@ -55,11 +56,15 @@ type RedisClusterReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.21.0/pkg/reconcile
 func (r *RedisClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+
 	redisCluster := &redopsv1alpha1.RedisCluster{}
 	if err := r.Get(ctx, req.NamespacedName, redisCluster); err != nil {
 		if apierrors.IsNotFound(err) {
-			r.Log.Info("RedisCluster resource not found. Ignoring since object must be deleted.")
+			r.Log.With(zax.Get(ctx)...).Info("RedisCluster resource not found. Ignoring since object must be deleted.")
 			return ctrl.Result{}, nil
+		}
+		if redisCluster.GetDeletionTimestamp() != nil {
+			if err := 
 		}
 		return ctrl.Result{}, err
 	}
